@@ -1,0 +1,159 @@
+.map-section {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0;
+}
+
+.map-section h2 {
+  text-align: center;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.map-section > p {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #666;
+}
+
+.location-selector {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.location-btn {
+  padding: 0.75rem 1.5rem;
+  border: 2px solid #ddd;
+  background-color: white;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #555;
+  transition: all 0.3s ease;
+}
+
+.location-btn:hover {
+  border-color: #113386;
+  color: #113386;
+}
+
+.location-btn.active {
+  background-color: #113386;
+  border-color: #113386;
+  color: white;
+}
+
+.map-container {
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto 1.5rem;
+  height: 500px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  /* iOS Safari fix: overflow:hidden + border-radius */
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+  transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
+}
+
+.google-map {
+  width: 100%;
+  height: 100%;
+  min-height: 500px;
+}
+
+.current-location {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.current-location h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.5rem;
+}
+
+.current-location p {
+  margin: 0;
+  font-size: 1rem;
+  opacity: 0.95;
+}
+
+.locations-list {
+  background-color: #f5f5f5;
+  padding: 1.5rem;
+  border-radius: 8px;
+}
+
+.locations-list h3 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.locations-list ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.locations-list li {
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  background-color: white;
+  border-radius: 4px;
+  border-left: 4px solid #FF0000;
+}
+
+.locations-list li strong {
+  color: #333;
+}
+
+.info-window-content {
+  padding: 0.5rem;
+}
+
+.info-window-content h3 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.info-window-content p {
+  margin: 0;
+  font-size: 0.875rem;
+  color: #666;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+  .location-btn {
+    padding: 0.5rem 1rem;
+    font-size: 0.875rem;
+  }
+  
+  .location-selector {
+    gap: 0.4rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .location-btn {
+    padding: 0.4rem 0.75rem;
+    font-size: 0.8rem;
+  }
+  
+  .location-selector {
+    gap: 0.3rem;
+  }
+}

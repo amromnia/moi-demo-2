@@ -8,6 +8,7 @@ import RegistrationSuccess from './components/RegistrationSuccess';
 import ForgotPassword from './components/ForgotPassword';
 import Dashboard from './components/Dashboard';
 import Profile from './components/Profile';
+import KioskServicePage from './components/kiosk-website/KioskServicePage';
 import { isLoggedIn } from './services/api';
 
 // Protected route wrapper that checks auth on each render
@@ -26,6 +27,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/homepage" element={<KioskServicePage />} />
         <Route path="/login" element={<Login />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
         <Route path="/register" element={<RegistrationStep1 />} />

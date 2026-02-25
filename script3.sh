@@ -51,6 +51,9 @@ else
   echo "Added new VITE_GOOGLE_MAPS_API_KEY"
 fi
 
+echo "Building project..."
+npm run build
+
 # Ensure pm2 exists
 if ! command -v pm2 >/dev/null 2>&1; then
   echo "Error: pm2 is not installed."

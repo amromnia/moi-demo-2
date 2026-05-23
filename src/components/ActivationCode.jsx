@@ -14,9 +14,10 @@ function ActivationCode() {
   const [canResend, setCanResend] = useState(false);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
-  // Get memberId, mobile, and password from location state
+  // Get memberId, mobile, username and password from location state
   const memberId = location.state?.memberId;
   const mobile = location.state?.mobile;
+  const username = location.state?.username;
   const password = location.state?.password;
 
   useEffect(() => {
@@ -100,8 +101,8 @@ function ActivationCode() {
       } else {
         // Server may report failure even when activation succeeded.
         // Try logging in with the user's credentials as a fallback.
-        if (mobile && password) {
-          const loginResult = await login(mobile, password);
+        if (username && password) {
+          const loginResult = await login(username, password);
           if (loginResult.success) {
             navigate('/dashboard', { state: { password } });
             return;

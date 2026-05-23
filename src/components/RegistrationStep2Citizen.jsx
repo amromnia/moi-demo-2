@@ -136,6 +136,7 @@ function RegistrationStep2Citizen() {
           state: { 
             memberId: result.data.memberId,
             mobile: userData.mobile,
+            username: userData.email,
             password: step1Data.password
           } 
         });

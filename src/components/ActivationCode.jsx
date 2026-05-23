@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { activateAccountBySMS } from '../services/api';
+import { activateAccountBySMS, login } from '../services/api';
 import logoImage from '../assets/logo.png';
 import '../styles/Auth.css';
 
@@ -98,6 +98,15 @@ function ActivationCode() {
       if (result.success) {
         navigate('/dashboard', { state: { password } });
       } else {
+        // Server may report failure even when activation succeeded.
+        // Try logging in with the user's credentials as a fallback.
+        if (mobile && password) {
+          const loginResult = await login(mobile, password);
+          if (loginResult.success) {
+            navigate('/dashboard', { state: { password } });
+            return;
+          }
+        }
         setError(result.message);
         // Clear code inputs
         setCode(['', '', '', '']);

@@ -29,8 +29,14 @@ BACKUP_STAMP="$(date +%Y-%m-%d_%H-%M-%S)"
 BACKUP_DIR="$BACKUP_ROOT/$BACKUP_STAMP"
 echo "Creating backup at $BACKUP_DIR ..."
 mkdir -p "$BACKUP_DIR"
-# Copy everything in current dir (including dotfiles) into the backup dir
-cp -a . "$BACKUP_DIR/"
+# Copy everything in current dir (including dotfiles) into the backup dir, excluding node_modules
+if command -v rsync >/dev/null 2>&1; then
+  rsync -a --exclude='node_modules' --exclude='node_modules/**' ./ "$BACKUP_DIR/"
+else
+  # Fallback: copy everything then drop node_modules dirs from the backup
+  cp -a . "$BACKUP_DIR/"
+  find "$BACKUP_DIR" -type d -name node_modules -prune -exec rm -rf {} +
+fi
 echo "Backup created."
 
 # Add the remote if it does not exist

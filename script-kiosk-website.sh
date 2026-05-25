@@ -24,14 +24,14 @@ export interface MarkerLocation {
 export const mapLocations: MarkerLocation[] = [
   {
     id: 1,
-    title: "City Center Almaza",
+    title: "سيتي سنتر الماظة",
     lat: 30.080834271607593,
     lng: 31.364956750887245,
     kioskLocation: "الدور الأول",
   },
   {
     id: 2,
-    title: "City Stars Mall",
+    title: "سيتي ستارز",
     lat: 30.073520403660975,
     lng: 31.34726801239841,
     kioskLocation: "الدور الأرضي – المرحلة الثانية",
@@ -39,14 +39,14 @@ export const mapLocations: MarkerLocation[] = [
   },
   {
     id: 3,
-    title: "Mall of Egypt",
+    title: "مول مصر",
     lat: 29.97317364046132,
     lng: 31.015265549124234,
     kioskLocation: "الدور الثاني",
   },
   {
     id: 4,
-    title: "Cairo Festival",
+    title: "كايرو فيستيفال",
     lat: 30.02903123835634,
     lng: 31.407714842726516,
     kioskLocation: "موقف P2 – بوابة K",
@@ -54,14 +54,14 @@ export const mapLocations: MarkerLocation[] = [
   },
   {
     id: 5,
-    title: "Arkan Plaza",
+    title: "أركان بلازا",
     lat: 30.020571468458463,
     lng: 31.00377365526882,
     kioskLocation: "عند المصعد – تحت دور السينما",
   },
   {
     id: 6,
-    title: "Mall of Arabia",
+    title: "مول العرب",
     lat: 30.00667873307919,
     lng: 30.97536331006401,
     kioskLocation: "عند بوابة 22",

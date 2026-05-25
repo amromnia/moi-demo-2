@@ -40,8 +40,12 @@ if ! git ls-remote --exit-code --heads "$REMOTE_NAME" "$CURRENT_BRANCH" >/dev/nu
   exit 1
 fi
 
-echo "Pulling latest changes from $REMOTE_NAME/$CURRENT_BRANCH..."
-git pull "$REMOTE_NAME" "$CURRENT_BRANCH"
+echo "Attempting clean merge from $REMOTE_NAME/$CURRENT_BRANCH..."
+if ! git merge --no-edit --no-stat "$REMOTE_NAME/$CURRENT_BRANCH"; then
+  echo "Error: Merge failed (likely due to conflicts). Aborting merge."
+  git merge --abort 2>/dev/null || true
+  exit 1
+fi
 
 echo "Building project..."
 npm run build

@@ -23,6 +23,16 @@ fi
 
 echo "Current branch: $CURRENT_BRANCH"
 
+# Take a backup of the entire current directory before doing anything
+BACKUP_ROOT="../repo-backups"
+BACKUP_STAMP="$(date +%Y-%m-%d_%H-%M-%S)"
+BACKUP_DIR="$BACKUP_ROOT/$BACKUP_STAMP"
+echo "Creating backup at $BACKUP_DIR ..."
+mkdir -p "$BACKUP_DIR"
+# Copy everything in current dir (including dotfiles) into the backup dir
+cp -a . "$BACKUP_DIR/"
+echo "Backup created."
+
 # Add the remote if it does not exist
 if ! git remote get-url "$REMOTE_NAME" >/dev/null 2>&1; then
   echo "Adding remote '$REMOTE_NAME'..."
@@ -41,10 +51,53 @@ if ! git ls-remote --exit-code --heads "$REMOTE_NAME" "$CURRENT_BRANCH" >/dev/nu
 fi
 
 echo "Attempting clean merge from $REMOTE_NAME/$CURRENT_BRANCH..."
-if ! git merge --no-edit --no-stat "$REMOTE_NAME/$CURRENT_BRANCH"; then
-  echo "Error: Merge failed (likely due to conflicts). Aborting merge."
+MERGE_OUTPUT="$(git merge --no-edit --no-stat "$REMOTE_NAME/$CURRENT_BRANCH" 2>&1)" && MERGE_RC=0 || MERGE_RC=$?
+echo "$MERGE_OUTPUT"
+
+if [ "$MERGE_RC" -ne 0 ]; then
+  # Try to recover only from the "local changes would be overwritten" case.
+  BLOCKING="$(printf '%s\n' "$MERGE_OUTPUT" | awk '/would be overwritten by merge:/{flag=1;next} /^Please commit your changes/{flag=0} flag {sub(/^[ \t]+/, ""); if ($0 != "") print}')"
+
+  # Make sure we are not stuck mid-merge.
   git merge --abort 2>/dev/null || true
-  exit 1
+
+  if [ -z "$BLOCKING" ]; then
+    echo "Error: Merge failed for a reason other than blocking local changes. Aborting."
+    exit 1
+  fi
+
+  # If ANY blocking file is not a .sh file, list them all and abort without touching anything.
+  NON_SH_BLOCKING=""
+  while IFS= read -r file; do
+    [ -z "$file" ] && continue
+    case "$file" in
+      *.sh) ;;
+      *)
+        NON_SH_BLOCKING="${NON_SH_BLOCKING}${file}"$'\n'
+        ;;
+    esac
+  done <<< "$BLOCKING"
+
+  if [ -n "$NON_SH_BLOCKING" ]; then
+    echo "Error: Blocking local changes in non-.sh files (refusing to modify these):"
+    printf '  - %s\n' $(printf '%s' "$NON_SH_BLOCKING")
+    echo "Aborting."
+    exit 1
+  fi
+
+  echo "Resolving blocking .sh files using $REMOTE_NAME/$CURRENT_BRANCH..."
+  while IFS= read -r file; do
+    [ -z "$file" ] && continue
+    echo "  Overwriting '$file' with version from $REMOTE_NAME/$CURRENT_BRANCH"
+    git checkout "$REMOTE_NAME/$CURRENT_BRANCH" -- "$file"
+  done <<< "$BLOCKING"
+
+  echo "Retrying merge from $REMOTE_NAME/$CURRENT_BRANCH..."
+  if ! git merge --no-edit --no-stat "$REMOTE_NAME/$CURRENT_BRANCH"; then
+    echo "Error: Merge still failed after resolving blocking files. Aborting."
+    git merge --abort 2>/dev/null || true
+    exit 1
+  fi
 fi
 
 echo "Building project..."

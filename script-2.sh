@@ -94,8 +94,15 @@ if [ "$MERGE_RC" -ne 0 ]; then
   echo "Resolving blocking .sh files using $REMOTE_NAME/$CURRENT_BRANCH..."
   while IFS= read -r file; do
     [ -z "$file" ] && continue
-    echo "  Overwriting '$file' with version from $REMOTE_NAME/$CURRENT_BRANCH"
-    git checkout "$REMOTE_NAME/$CURRENT_BRANCH" -- "$file"
+    if git cat-file -e "$REMOTE_NAME/$CURRENT_BRANCH:$file" 2>/dev/null; then
+      echo "  Overwriting '$file' with version from $REMOTE_NAME/$CURRENT_BRANCH"
+      git checkout "$REMOTE_NAME/$CURRENT_BRANCH" -- "$file"
+    else
+      echo "  '$file' does not exist on $REMOTE_NAME/$CURRENT_BRANCH -> discarding local changes (reset to HEAD, then remove)"
+      git checkout HEAD -- "$file" 2>/dev/null || true
+      rm -f -- "$file"
+      git rm -f --quiet --ignore-unmatch -- "$file" 2>/dev/null || true
+    fi
   done <<< "$BLOCKING"
 
   echo "Retrying merge from $REMOTE_NAME/$CURRENT_BRANCH..."

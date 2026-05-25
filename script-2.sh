@@ -114,7 +114,7 @@ if [ "$MERGE_RC" -ne 0 ]; then
 fi
 
 echo "Building project..."
-npm run build
+npm run build < /dev/null
 
 # Ensure pm2 exists
 if ! command -v pm2 >/dev/null 2>&1; then
@@ -123,7 +123,7 @@ if ! command -v pm2 >/dev/null 2>&1; then
 fi
 
 echo "Restarting PM2..."
-pm2 restart all --update-env
+pm2 restart all < /dev/null
 pm2 list
 
 echo "Update completed successfully."

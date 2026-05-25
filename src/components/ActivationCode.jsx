@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { activateAccountBySMS } from '../services/api';
+import { activateAccountBySMS, login } from '../services/api';
 import logoImage from '../assets/logo.png';
 import '../styles/Auth.css';
 
@@ -14,9 +14,10 @@ function ActivationCode() {
   const [canResend, setCanResend] = useState(false);
   const inputRefs = [useRef(), useRef(), useRef(), useRef()];
 
-  // Get memberId, mobile, and password from location state
+  // Get memberId, mobile, username and password from location state
   const memberId = location.state?.memberId;
   const mobile = location.state?.mobile;
+  const username = location.state?.username;
   const password = location.state?.password;
 
   useEffect(() => {
@@ -98,6 +99,15 @@ function ActivationCode() {
       if (result.success) {
         navigate('/dashboard', { state: { password } });
       } else {
+        // Server may report failure even when activation succeeded.
+        // Try logging in with the user's credentials as a fallback.
+        if (username && password) {
+          const loginResult = await login(username, password);
+          if (loginResult.success) {
+            navigate('/dashboard', { state: { password } });
+            return;
+          }
+        }
         setError(result.message);
         // Clear code inputs
         setCode(['', '', '', '']);

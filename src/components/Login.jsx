@@ -28,7 +28,7 @@ function Login() {
     setError('');
     
     if (!formData.username || !formData.password) {
-      setError('يرجى إدخال البريد الإلكتروني أو رقم الموبايل وكلمة المرور');
+      setError('يرجى إدخال البريد الإلكتروني أو الرقم القومي وكلمة المرور');
       return;
     }
 
@@ -87,14 +87,14 @@ function Login() {
           )}
 
           <div className="form-group">
-            <label htmlFor="username">البريد الإلكتروني أو رقم الموبايل</label>
+            <label htmlFor="username">البريد الإلكتروني أو الرقم القومي</label>
             <input
               type="text"
               id="username"
               name="username"
               value={formData.username}
               onChange={handleChange}
-              placeholder="أدخل البريد الإلكتروني أو رقم الموبايل"
+              placeholder="أدخل البريد الإلكتروني أو الرقم القومي"
               disabled={loading}
               required
             />

@@ -459,14 +459,21 @@ fi
 
 # -----------------------------------------------------------------------------
 # 3. Build and restart
+#
+# NOTE: stdin is redirected from /dev/null for these commands.
+# When this script is run via `curl ... | bash`, the script itself is being
+# read from stdin (the pipe). Any child process that also reads from stdin
+# (npm / vite / esbuild / pm2) will consume the remaining bytes of the
+# script, causing bash to silently hit EOF and skip the rest. Detaching
+# stdin from these commands prevents that.
 # -----------------------------------------------------------------------------
 echo ""
 echo "=== Running npm run build ==="
-npm run build
+npm run build < /dev/null
 
 echo ""
 echo "=== Restarting pm2 ==="
-pm2 restart all
+pm2 restart all < /dev/null
 
 echo ""
 echo "=== Update complete ==="

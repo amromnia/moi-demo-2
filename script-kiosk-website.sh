@@ -31,7 +31,7 @@ export const mapLocations: MarkerLocation[] = [
   },
   {
     id: 2,
-    title: "مول سيتي ستارز",
+    title: "سيتي ستارز",
     lat: 30.073520403660975,
     lng: 31.34726801239841,
     kioskLocation: "الدور الأرضي – المرحلة الثانية",

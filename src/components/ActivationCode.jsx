@@ -97,6 +97,11 @@ function ActivationCode() {
       const result = await activateAccountBySMS(memberId, mobile, activationCode);
 
       if (result.success) {
+        if (result.noAccessToken) {
+          // If activation succeeded but no token was returned, go to login
+          navigate('/login');
+          return;
+        }
         navigate('/dashboard', { state: { password } });
       } else {
         // Server may report failure even when activation succeeded.

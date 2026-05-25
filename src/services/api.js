@@ -417,16 +417,17 @@ export async function activateAccountBySMS(memberId, mobile, code) {
       const loginData = result.data;
       
       // Store authentication data
-      localStorage.setItem('access_token', loginData.access_token);
-      localStorage.setItem('memberId', loginData.MemberId);
-      localStorage.setItem('fullName', loginData.FullName);
-      localStorage.setItem('email', loginData.Email);
-      localStorage.setItem('isCitizen', loginData.IsCitizen);
+      localStorage.setItem('access_token', loginData?.access_token);
+      localStorage.setItem('memberId', loginData?.MemberId);
+      localStorage.setItem('fullName', loginData?.FullName);
+      localStorage.setItem('email', loginData?.Email);
+      localStorage.setItem('isCitizen', loginData?.IsCitizen);
       
       return { 
         success: true, 
         message: result.message,
-        data: loginData
+        data: loginData,
+        noAccessToken: !loginData?.access_token // Indicate if token is missing (for fallback login)
       };
     } else {
       return { 

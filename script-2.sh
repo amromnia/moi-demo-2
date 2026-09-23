@@ -137,11 +137,7 @@ if [ "$KIOSK_EXISTED_LOCALLY" -eq 1 ]; then
   cp -a "$KIOSK_SNAPSHOT/." "$KIOSK_PATH/"
 fi
 rm -rf -- "$KIOSK_SNAPSHOT"
-if ! git diff --quiet --cached -- "$KIOSK_PATH" || ! git diff --quiet -- "$KIOSK_PATH"; then
-  echo "Excluded $KIOSK_PATH from this update (restored exact local snapshot)."
-  git add -A -- "$KIOSK_PATH"
-  git commit -m "Exclude $KIOSK_PATH from automated update" --quiet
-fi
+echo "Excluded $KIOSK_PATH from this update (restored exact local snapshot)."
 
 echo "Building project..."
 npm run build < /dev/null

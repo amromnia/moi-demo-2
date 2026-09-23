@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getGovernorates, registerCitizen } from '../services/api';
+import { getGovernorates, registerCitizen, login } from '../services/api';
 import { 
   validateNationalId,
   validateFactoryNumber,
@@ -131,15 +131,13 @@ function RegistrationStep2Citizen() {
       if (result.success) {
         // Clear session storage
         sessionStorage.removeItem('registrationStep1');
-        // Navigate to activation code screen
-        navigate('/activation', { 
-          state: { 
-            memberId: result.data.memberId,
-            mobile: userData.mobile,
-            username: userData.email,
-            password: step1Data.password
-          } 
-        });
+        // Mobile is now verified outside the system, so log in immediately
+        const loginResult = await login(userData.email, step1Data.password);
+        if (loginResult.success) {
+          navigate('/dashboard');
+        } else {
+          setError('فشل تسجيل الدخول بعد التسجيل، يرجى المحاولة عبر صفحة الدخول');
+        }
       } else {
         setError(result.message);
       }

@@ -3,7 +3,6 @@ import Login from './components/Login';
 import RegistrationStep1 from './components/RegistrationStep1';
 import RegistrationStep2Citizen from './components/RegistrationStep2Citizen';
 import RegistrationStep2Foreigner from './components/RegistrationStep2Foreigner';
-import ActivationCode from './components/ActivationCode';
 import RegistrationSuccess from './components/RegistrationSuccess';
 import ForgotPassword from './components/ForgotPassword';
 import Dashboard from './components/Dashboard';
@@ -32,7 +31,6 @@ function App() {
         <Route path="/register" element={<RegistrationStep1 />} />
         <Route path="/register/citizen" element={<RegistrationStep2Citizen />} />
         <Route path="/register/foreigner" element={<RegistrationStep2Foreigner />} />
-        <Route path="/activation" element={<ActivationCode />} />
         <Route path="/registration-success" element={<RegistrationSuccess />} />
         <Route 
           path="/dashboard" 

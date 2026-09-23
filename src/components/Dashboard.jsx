@@ -1,5 +1,5 @@
 import { useEffect, useState, useRef } from 'react';
-import { useNavigate, useLocation, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { getCurrentUser, logout, isLoggedIn } from '../services/api';
 import { syncWithTrafficService, needsTrafficSync, markTrafficSynced } from '../utils/trafficSync';
 import logoImage from '../assets/logo.png';
@@ -10,7 +10,6 @@ const ENABLE_TRAFFIC_SYNC = import.meta.env.VITE_ENABLE_TRAFFIC_SYNC !== 'false'
 
 function Dashboard() {
   const navigate = useNavigate();
-  const location = useLocation();
   const [user, setUser] = useState(null);
   const [trafficSync, setTrafficSync] = useState({
     status: 'idle', // idle, syncing, success, error
@@ -29,12 +28,6 @@ function Dashboard() {
     const currentUser = getCurrentUser();
     setUser(currentUser);
 
-    // Store password from navigation state if provided
-    if (location.state?.password) {
-      localStorage.setItem('user_password', location.state.password);
-      navigate(location.pathname, { replace: true, state: {} });
-    }
-
     // Check if traffic sync is enabled and needed (only if not already initiated)
     if (ENABLE_TRAFFIC_SYNC) {
       if (needsTrafficSync() && !syncInitiatedRef.current) {
@@ -46,7 +39,7 @@ function Dashboard() {
     } else {
       setTrafficSync({ status: 'idle', message: '' });
     }
-  }, [navigate, location]);
+  }, [navigate]);
 
   const handleTrafficSync = async (userData) => {
     if (!userData) {

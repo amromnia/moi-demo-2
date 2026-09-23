@@ -63,8 +63,6 @@ export async function login(username, password) {
           localStorage.setItem('fullName', data.FullName || '');
           localStorage.setItem('email', data.Email || '');
           localStorage.setItem('isCitizen', data.IsCitizen || 'False');
-          // Store password for traffic sync (cleared on logout)
-          localStorage.setItem('user_password', password);
           
           // Verify storage worked
           const storedToken = localStorage.getItem('access_token');
@@ -351,7 +349,6 @@ export function logout() {
   localStorage.removeItem('fullName');
   localStorage.removeItem('email');
   localStorage.removeItem('isCitizen');
-  localStorage.removeItem('user_password');
 }
 
 /**
@@ -382,66 +379,6 @@ export function getCurrentUser() {
   };
   
   return user;
-}
-
-/**
- * Activate account by SMS code
- * @param {string} memberId - User's member ID from registration
- * @param {string} mobile - User's mobile number
- * @param {string} code - 4-digit activation code from SMS
- * @returns {Promise<{success: boolean, data?: object, message?: string}>}
- */
-export async function activateAccountBySMS(memberId, mobile, code) {
-  const payload = {
-    memberId: memberId,
-    mobile: mobile,
-    code: code
-  };
-
-  try {
-    const response = await fetch(
-      buildApiUrl('/api/mobile_memberApi/ActivateBySMS'),
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(payload)
-      }
-    );
-
-    const result = await response.json();
-    
-    if (result.status === 1) {
-      // Activation successful - user is now logged in
-      const loginData = result.data;
-      
-      // Store authentication data
-      localStorage.setItem('access_token', loginData?.access_token);
-      localStorage.setItem('memberId', loginData?.MemberId);
-      localStorage.setItem('fullName', loginData?.FullName);
-      localStorage.setItem('email', loginData?.Email);
-      localStorage.setItem('isCitizen', loginData?.IsCitizen);
-      
-      return { 
-        success: true, 
-        message: result.message,
-        data: loginData,
-        noAccessToken: !loginData?.access_token // Indicate if token is missing (for fallback login)
-      };
-    } else {
-      return { 
-        success: false, 
-        message: result.message || 'فشل التفعيل' 
-      };
-    }
-  } catch (error) {
-    console.error('Activation error:', error);
-    return { 
-      success: false, 
-      message: 'حدث خطأ في الاتصال، يرجى المحاولة مرة أخرى' 
-    };
-  }
 }
 
 /**

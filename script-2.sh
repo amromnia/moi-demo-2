@@ -56,13 +56,27 @@ if ! git ls-remote --exit-code --heads "$REMOTE_NAME" "$CURRENT_BRANCH" >/dev/nu
   exit 1
 fi
 
+# This directory is excluded from every sync: snapshot the exact live working-tree
+# state (including any uncommitted/untracked local edits) now, then neutralize it
+# so it can never conflict with or block the merge, then restore the snapshot
+# byte-for-byte afterward no matter what the merge did to it.
+KIOSK_PATH="src/components/kiosk-website"
+KIOSK_SNAPSHOT="$(mktemp -d)"
+KIOSK_EXISTED_LOCALLY=0
+if [ -e "$KIOSK_PATH" ]; then
+  KIOSK_EXISTED_LOCALLY=1
+  cp -a "$KIOSK_PATH/." "$KIOSK_SNAPSHOT/"
+fi
+git checkout -- "$KIOSK_PATH" 2>/dev/null || true
+git clean -fd -- "$KIOSK_PATH" 2>/dev/null || true
+
 echo "Attempting clean merge from $REMOTE_NAME/$CURRENT_BRANCH..."
 MERGE_OUTPUT="$(git merge --no-edit --no-stat "$REMOTE_NAME/$CURRENT_BRANCH" 2>&1)" && MERGE_RC=0 || MERGE_RC=$?
 echo "$MERGE_OUTPUT"
 
 if [ "$MERGE_RC" -ne 0 ]; then
   # Try to recover only from the "local changes would be overwritten" case.
-  BLOCKING="$(printf '%s\n' "$MERGE_OUTPUT" | awk '/would be overwritten by merge:/{flag=1;next} /^Please commit your changes/{flag=0} flag {sub(/^[ \t]+/, ""); if ($0 != "") print}')"
+  BLOCKING="$(printf '%s\n' "$MERGE_OUTPUT" | awk '/would be overwritten by merge:/{flag=1;next} /^Please (commit your changes|move or remove them)/{flag=0} flag {sub(/^[ \t]+/, ""); if ($0 != "") print}')"
 
   # Make sure we are not stuck mid-merge.
   git merge --abort 2>/dev/null || true
@@ -86,7 +100,9 @@ if [ "$MERGE_RC" -ne 0 ]; then
 
   if [ -n "$NON_SH_BLOCKING" ]; then
     echo "Error: Blocking local changes in non-.sh files (refusing to modify these):"
-    printf '  - %s\n' $(printf '%s' "$NON_SH_BLOCKING")
+    while IFS= read -r file; do
+      [ -n "$file" ] && printf '  - %s\n' "$file"
+    done <<< "$NON_SH_BLOCKING"
     echo "Aborting."
     exit 1
   fi
@@ -111,6 +127,20 @@ if [ "$MERGE_RC" -ne 0 ]; then
     git merge --abort 2>/dev/null || true
     exit 1
   fi
+fi
+
+# Restore the exact pre-merge $KIOSK_PATH snapshot, discarding whatever the merge
+# brought in for it (untracked local edits included — never just HEAD/remote).
+rm -rf -- "$KIOSK_PATH"
+if [ "$KIOSK_EXISTED_LOCALLY" -eq 1 ]; then
+  mkdir -p "$KIOSK_PATH"
+  cp -a "$KIOSK_SNAPSHOT/." "$KIOSK_PATH/"
+fi
+rm -rf -- "$KIOSK_SNAPSHOT"
+if ! git diff --quiet --cached -- "$KIOSK_PATH" || ! git diff --quiet -- "$KIOSK_PATH"; then
+  echo "Excluded $KIOSK_PATH from this update (restored exact local snapshot)."
+  git add -A -- "$KIOSK_PATH"
+  git commit -m "Exclude $KIOSK_PATH from automated update" --quiet
 fi
 
 echo "Building project..."
